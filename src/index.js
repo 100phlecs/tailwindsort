@@ -15,15 +15,15 @@ export function extractFile(relativeFilePath) {
   const filePath = path.resolve(process.cwd(), relativeFilePath)
 
   if (!fs.existsSync(filePath)) {
-    console.err("html file does not exist");
-    return;
+    const err = new Error('Passed in file does not exist')
+    err.code = 2
+    throw err;
   }
 
-  const contents = fs.readFileSync(filePath).toString('utf-8')
-  return contents;
+  const contents = fs.readFileSync(filePath, 'utf-8')
+  // readFileSync appends a '\n' 
+  return contents.slice(0, -1)
 }
-
-
 
 export async function loadCustomConfig(relativeConfigPath) {
   const configPath = path.resolve(process.cwd(), relativeConfigPath); 
@@ -38,8 +38,6 @@ export async function loadCustomConfig(relativeConfigPath) {
   return tailwindconfig 
 }
 
-
-
 function sortClasses(contents, twcontext) {
   const sorted = contents.replaceAll(classRegex, (match, p1, p2) => {
     let ordered = twcontext.getClassOrder(p2.split(" ")).sort(([, a], [, z]) => {
@@ -47,9 +45,9 @@ function sortClasses(contents, twcontext) {
       if (a === null) return -1
       if (z === null) return 1
       return bigSign(a - z)
-    }).map(([className]) => className).flat().join(" ")
+    }).map(([className]) => className).join(" ")
     return match.replace(p2, ordered)
-  })    
+  })
   return sorted 
 }
 
@@ -58,7 +56,7 @@ export async function format(contents, relativeConfigPath) {
   const twconfig = await resolveConfig(customconfig)
   const twcontext = await createContext(twconfig)
   const formatted = sortClasses(contents, twcontext)
-  return formatted 
+  return formatted
 }
 
 
