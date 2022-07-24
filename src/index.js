@@ -23,18 +23,22 @@ export function extractFile(relativeFilePath) {
   return contents;
 }
 
-export async function getTailwindContext(relativeConfigPath) {
+
+
+export async function loadCustomConfig(relativeConfigPath) {
   const configPath = path.resolve(process.cwd(), relativeConfigPath); 
 
   if (!fs.existsSync(configPath)) {
-    console.err("config file does not exist");
-    return;
+    const err = new Error('Config file does not exist')
+    err.code = 2 
+    throw err
   }
 
   const tailwindconfig = await requireFresh(configPath)
-  const twcontext = await createContext(resolveConfig(tailwindconfig))
-  return twcontext
+  return tailwindconfig 
 }
+
+
 
 function sortClasses(contents, twcontext) {
   const sorted = contents.replaceAll(classRegex, (match, p1, p2) => {
@@ -50,9 +54,11 @@ function sortClasses(contents, twcontext) {
 }
 
 export async function format(contents, relativeConfigPath) {
-  const twcontext = await getTailwindContext(relativeConfigPath)
+  const customconfig = relativeConfigPath ? await loadCustomConfig(relativeConfigPath) : {}
+  const twconfig = await resolveConfig(customconfig)
+  const twcontext = await createContext(twconfig)
   const formatted = sortClasses(contents, twcontext)
-  return formatted
+  return formatted 
 }
 
 
