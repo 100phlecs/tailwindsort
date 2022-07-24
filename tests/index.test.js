@@ -1,6 +1,13 @@
-import { format } from '../index.js'
+import path from 'path'
+import { format, getTailwindContext } from '../index.js'
 
-test('adds 1 + 2 to equal 3', () => {
-  expect(1+2).toBe(3);
+
+
+test('non-tailwind classes', async () => {
+  const twcontext = await getTailwindContext(path.join(__dirname, 'fixtures/basic/tailwind.config.js'))
+  expect(format('<div class="sm:lowercase uppercase potato text-sm"></div>', twcontext)).toEqual(
+    '<div class="potato text-sm uppercase sm:lowercase"></div>'
+  )
 })
+
 
