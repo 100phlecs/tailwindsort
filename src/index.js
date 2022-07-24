@@ -10,8 +10,21 @@ function bigSign(bigIntValue) {
   return (bigIntValue > 0n) - (bigIntValue < 0n)
 }
 
-export async function getTailwindContext(configFilePath) {
-  const configPath = path.resolve(process.cwd(), configFilePath); 
+
+export function extractFile(relativeFilePath) {
+  const filePath = path.resolve(process.cwd(), relativeFilePath)
+
+  if (!fs.existsSync(filePath)) {
+    console.err("html file does not exist");
+    return;
+  }
+
+  const contents = fs.readFileSync(filePath).toString('utf-8')
+  return contents;
+}
+
+export async function getTailwindContext(relativeConfigPath) {
+  const configPath = path.resolve(process.cwd(), relativeConfigPath); 
   console.log(configPath)
 
   if (!fs.existsSync(configPath)) {
@@ -24,10 +37,9 @@ export async function getTailwindContext(configFilePath) {
   return twcontext
 }
 
-export function format(contents, twcontext) {
-
-  const formatted = contents.replaceAll(classRegex, (match, p1, p2) => {
-    const ordered = twcontext.getClassOrder(p2.split(" ")).sort(([, a], [, z]) => {
+function sortClasses(contents, twcontext) {
+  const sorted = contents.replaceAll(classRegex, (match, p1, p2) => {
+    let ordered = twcontext.getClassOrder(p2.split(" ")).sort(([, a], [, z]) => {
       if (a === z) return 0
       if (a === null) return -1
       if (z === null) return 1
@@ -35,6 +47,12 @@ export function format(contents, twcontext) {
     }).map(([className]) => className).flat().join(" ")
     return match.replace(p2, ordered)
   })    
+  return sorted 
+}
+
+export async function format(contents, relativeConfigPath) {
+  const twcontext = await getTailwindContext(relativeConfigPath)
+  const formatted = sortClasses(contents, twcontext)
   return formatted
 }
 
