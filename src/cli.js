@@ -12,7 +12,7 @@ program
     if (options.file) 
       html = extractFile(html)
     const formatted = await format(html, options.config)
-    console.log(formatted)  
+    process.stdout.write(formatted)
   })
 program.parse()
 

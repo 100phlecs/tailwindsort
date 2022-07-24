@@ -10,7 +10,7 @@
     "prebuild": "rimraf dist && rimraf lib && npm run transpile",
     "postbuild": "move-file dist/cli-macos-x64 dist/tailwindsort-macos-x64 && move-file dist/cli-macos-arm64 dist/tailwindsort-macos-arm64 && move-file dist/cli-win-x64.exe dist/tailwindsort-windows-x64.exe && move-file dist/cli-linuxstatic-x64 dist/tailwindsort-linux-x64 && move-file dist/cli-linuxstatic-arm64 dist/tailwindsort-linux-arm64",
     "test": "jest",
-    "b": "npm run prebuild && npm run build && npm run postbuild"
+    "b": "npm run prebuild && npm run build"
   },
   "repository": {
     "type": "git",

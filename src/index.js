@@ -25,7 +25,6 @@ export function extractFile(relativeFilePath) {
 
 export async function getTailwindContext(relativeConfigPath) {
   const configPath = path.resolve(process.cwd(), relativeConfigPath); 
-  console.log(configPath)
 
   if (!fs.existsSync(configPath)) {
     console.err("config file does not exist");
